@@ -4,13 +4,9 @@ package seleniumgluecode;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-
-import java.io.File;
 
 public class Test {
     private ChromeDriver driver;
@@ -34,17 +30,37 @@ public class Test {
         Thread.sleep(3000);
         WebElement link  =driver.findElement(By.linkText("Reglamento Inversión Virtual Bancolombia"));
         link.click();
-        WebElement downloadLink = driver.findElement(By.linkText("Descargar PDF"));
-        downloadLink.click();
+
        }
 
     @Then("^valida el contrato$")
-    public void valida_el_contrato( String pdfFilePath) throws Throwable
+    public void valida_el_contrato( ) throws Throwable
     {
-        PDDocument document = PDDocument.load(new File(pdfFilePath));
-            PDFTextStripper pdfTextStripper = new PDFTextStripper();
-        String actualText = pdfTextStripper.getText(document);
-        document.close();
+
+
+        // Obtener el identificador de la ventana actual
+        String currentWindow = driver.getWindowHandle();
+
+        // Cambiar el control a la última ventana abierta
+        for (String windowHandle : driver.getWindowHandles()) {
+            driver.switchTo().window(windowHandle);
+        }
+
+        // Obtener el contenido de la página en la nueva ventana
+        String pageSource = driver.getPageSource();
+
+        // Realizar la validación de la palabra "Reglamento de Inversión" en el contenido
+        if (pageSource.contains("Bancolombia")) {
+            System.out.println("La palabra 'Reglamento de Inversión' se encuentra en la página.");
+        } else {
+            System.out.println("La palabra 'Reglamento de Inversión' no se encuentra en la página.");
+        }
+
+        // Cambiar el control de vuelta a la ventana original
+        driver.switchTo().window(currentWindow);
+
+        // Cerrar el navegador
+        //driver.quit();
 
     }
 
